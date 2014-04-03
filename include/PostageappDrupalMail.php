@@ -5,7 +5,6 @@
  *
  */
 
-
 /**
  * Provides a mail system class useful for debugging mail output.
  *
@@ -18,9 +17,6 @@ class PostageappDrupalMail extends DefaultMailSystem {
 
   /**
    * Overrides DefaultMailSystem::mail().
-   *
-   * Accepts an e-mail message and displays it on screen, and additionally logs
-   * it to watchdog().
    */
   public function mail(array $message) {
     $header = "To: {$message['to']} <br />Subject: {$message['subject']}";

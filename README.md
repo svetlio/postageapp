@@ -1,7 +1,7 @@
-Drupal module for PostageApp
+Drupal-7 module for PostageApp
 ======================================
 
-Coming soon!!
+Coming soon!!!
 
 Questions / Comments?
 ---------------------

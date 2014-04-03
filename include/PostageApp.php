@@ -111,5 +111,3 @@ class PostageApp
     return json_decode($output);
   }
 }
-
-?>
