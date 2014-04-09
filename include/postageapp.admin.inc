@@ -1,8 +1,10 @@
 <?php
+// $Id$
 
 /**
  * Admin settings form for the PostageApp API.
  */
+
 function postageapp_admin_form() {
   $form = array();
   
@@ -15,6 +17,7 @@ function postageapp_admin_form() {
   else {
     if (variable_get('postageapp_on', 0)) {
       $postageapp_path = drupal_get_filename('module', 'postageapp');
+      
       if ($postageapp_path) {
         variable_set('smtp_library', $postageapp_path);
       }
@@ -30,30 +33,22 @@ function postageapp_admin_form() {
   }
   
   $form['settings'] = array(
-    '#type' => 'fieldset',
+    '#type'  => 'fieldset',
     '#title' => t('Postageapp settings'),
   );
   $form['settings']['postageapp_on'] = array(
-    '#type' => 'radios',
-    '#title' => t('Enable Postageapp service'),
+    '#type'          => 'radios',
+    '#title'         => t('Enable Postageapp service'),
     '#default_value' => variable_get('postageapp_on', 0),
-    '#options' => array(1 => t('Yes'), 0 => t('No')),
+    '#options'       => array(1 => t('Yes'), 0 => t('No')),
   );
   
   $form['settings']['postageapp_api_key'] = array(
-    '#type' => 'textfield',
-    '#title' => t('PostageApp API Key'),
-    '#required' => TRUE,
-    '#default_value' => variable_get('postageapp_api_key', ''),
-    '#description' => t('The API key for your PostageApp project. Get or generate a valid API key at your PostageApp dashboard which is available at yourusername.postageapp.com')
-  );
-  
-  //
-  $form['postageapp_debugging'] = array(
-    '#type' => 'checkbox',
-    '#title' => t('Enable debugging'),
-    '#default_value' => variable_get('postageapp_debugging', 0),
-    '#description' => t('Checking this box will send flag messages as testing messages (currently in development).'),
+      '#type' => 'textfield',
+      '#title' => t('PostageApp API Key'),
+      '#required' => TRUE,
+      '#default_value' => variable_get('postageapp_api_key', ''),
+      '#description' => t('The API key for your PostageApp account. Get or generate a valid API key at your PostageApp dashboard which is available at yourusername.postageapp.com')
   );
   
   // only show the list selection forms if account info provided
@@ -85,6 +80,8 @@ function postageapp_admin_form() {
         $users_string .= '<p>' . $val . ': ' . $key . '</p>';
       }
       
+      //krumo($users);
+      
       $form['postageapp_project_info']['users'] = array('#value' => t($users_string));
       variable_set('postageapp_users', $users);
       
@@ -93,46 +90,33 @@ function postageapp_admin_form() {
         drupal_set_message(t('Your API key is valid.  Welcome to PostageApp.'), "notice");
       }
       
+      $form['postageapp_debugging'] = array(
+        '#type'          => 'checkbox',
+        '#title'         => t('Enable debugging'),
+        '#default_value' => variable_get('postageapp_debugging', 0),
+        '#description'   => t('Checking this box will send flag messages as testing messages (currently in development).'),
+      );
       
+      $form['send_test_email'] = array(
+        '#type' => 'button',
+        '#value' => t('Send Test Email'),
+        '#weight' => 19
+      );
     }
     else {
       drupal_set_message(t($valid_key->response->message), "error");
     }
   }
   
-  //
-  if (isset($valid_key) && $valid_key->response->status == 'ok' && variable_get('postageapp_debugging', '')) {
-    $form['send_test_email'] = array(
-      '#type' => 'button',
-      '#value' => t('Send Test Email'),
-      '#weight' => 19
-    );
-  }
-  
   return system_settings_form($form);
 }
 
-/**
- * Postageapp settings form validate().
- */
 function postageapp_admin_form_validate($form, &$form_state) {
   if ($form_state['clicked_button']['#value'] == 'Send Test Email') {
     postageapp_send_test_email();
   }
 }
 
-// function postageapp_admin_form_alter($form, &$form_state) {
-//   $form['#submit'][] = 'postageapp_admin_form_submit';
-// }
-
-// function postageapp_admin_form_submit($form_id, &$form_state) {
-//   if ($form['#post']['op'] == 'Send Test Email') postageapp_send_test_email($form['#post']);
-// }
-
-
-/**
- * Helper function
- */
 function postageapp_send_test_email() {
   global $language;
   
@@ -153,7 +137,7 @@ function postageapp_send_test_email() {
 }
 
 /**
- * Implements hook_mail().
+ * Implementation of postageapp_mail().
  */
 function postageapp_mail($key, &$message, $params) {
   if ($key == 'postageapp-test') {

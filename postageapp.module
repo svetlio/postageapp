@@ -23,7 +23,7 @@ function postageapp_help($path, $arg) {
 }
 
 /**
- * Implements hook_menu().
+ * Implements hook_menu()
  */
 function postageapp_menu() {
   $items['admin/config/services/postageapp'] = array(
@@ -40,7 +40,7 @@ function postageapp_menu() {
 }
 
 /**
- * Implements hook_permission().
+ * Implements hook_permission()
  */
 function postageapp_permission() {
   return array(
@@ -50,3 +50,23 @@ function postageapp_permission() {
     ),
   );
 }
+
+/*
+function drupal_mail_wrapper($message) {
+  $q = new PostageApp(variable_get('postageapp_api_key', '')); 
+  $return = $q->mail(
+    $message['to'], 
+    $message['subject'],
+    $message['body'],
+    $message['headers']
+  );
+  
+  if (!($return->response->status == 'ok')) {
+    watchdog('mail', 'PostageApp: %message.', array('%message' => $return->response->message), WATCHDOG_ERROR);
+    return 0;
+  } else {
+    return $return;
+  }
+}*/
+
+

@@ -1,4 +1,7 @@
 <?php
+/**
+ * PostageApp class.
+ */
 
 if(!defined('POSTAGE_HOSTNAME')) define ('POSTAGE_HOSTNAME', 'https://api.postageapp.com');
 

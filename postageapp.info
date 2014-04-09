@@ -3,6 +3,5 @@ description = This module allows you to send mail using the PostageApp API.
 package = Mail
 core = 7.x
 php = 5.3
-files[] = include/PostageappDrupalMail.php
+files[] = include/HelperDrupalPostageapp.php
 files[] = include/PostageApp.php
-configure = admin/config/services/postageapp

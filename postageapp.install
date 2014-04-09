@@ -5,11 +5,62 @@
  *   Install file for postageapp module.
  */
 
- /**
- * Implementation of hook_uninstall().
+/**
+ * Implements hook_uninstall().
  */
 function postageapp_uninstall() {
   variable_del('smtp_library');
 }
 
-?>
+/**
+ * Implements hook_requirements().
+ */
+function postageapp_requirements($phase) {
+  $requirements = array();
+  // Ensure translations don't break during installation.
+  $t = get_t();
+  
+  if ($phase == 'runtime') {
+   // required settings
+   // $conf['mail_system']['default-system'] = 'PostageappDrupalMail';
+   
+   $file = './sites/default/settings.php';
+   $handle = fopen($file, "r");
+   
+   if ($handle) {
+    while (($line = fgets($handle)) !== false) {
+      // process the line read.
+      
+      $conf = '$conf[\'mail_system\'][\'default-system\'] = \'PostageappDrupalMail\';';
+      
+      if (trim($line) == $conf) {
+       $value = 'Postageapp in settings.php OK!';
+       $severity = REQUIREMENT_OK;
+       
+       break;
+      }
+      else {
+       $value = 'Missing Postageapp settings in settings.php. See README.md
+      for instruction!';
+       $severity = REQUIREMENT_WARNING;
+      }
+    }
+   }
+   else {
+    // error opening the file.
+    drupal_set_message('Can\'t read settings.php file.');
+   }
+   
+   fclose($handle);
+   
+    $requirements['postageapp'] = array(
+      'title' => $t('Postageapp settings'),
+      'value' => $t($value),
+      //'description' => $t('Postageapp settings required'),
+      'severity' => $severity,
+      //'weight
+    );
+  }
+  
+  return $requirements;
+}
