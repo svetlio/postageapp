@@ -13,9 +13,9 @@ function postageapp_help($path, $arg) {
   $output = '';
   switch ($path) {
     case "admin/help#postageapp":
-      $output = '<p>'.  t("Allows you to send mail using the PostageApp API.  See http://postageapp.com for more info.") .'</p>';
+      $output = '<p>'.  t("Allows you to using the PostageApp API to send mail. We can send mails without own mail server application on your server. Instead, module send all outgoing site emails to Postageapp. How the module send messages to postageapp without real mail server - you can see in module code.<br>There we may use templates to get html on the messages before they send to their recepients.<p> <b>Important for settings!</b> You need to make template before using it. See Postageapp docs for this. Ont his site we can setup template for each mail form. Go to settings link.<p> See <a href=\"@postageapp\" target=\"_blank\">postageapp site</a> for more info.", array('@postageapp' => url('http://postageapp.com'))) .'</p>';
       break;
-    case "admin/settings/postageapp":
+    case "admin/config/services/postageapp":
       $output = '<p>'.  t("Enter text here to describe how to set up postageApp.  See http://postageapp.com for more info.") .'</p>';
       break;
   }
@@ -29,12 +29,45 @@ function postageapp_menu() {
   $items['admin/config/services/postageapp'] = array(
     'title' => 'PostageApp settings',
     'description' => t('Settings for PostageApp integration'),
-    'type' => MENU_NORMAL_ITEM,
     'page callback' => 'drupal_get_form',
     'page arguments' => array('postageapp_admin_form'),
     'access arguments' => array('administer postageapp'),
     'file' => 'include/postageapp.admin.inc',
+    'type' => MENU_NORMAL_ITEM,
+    'weight' => 0,
   );
+  $items['admin/config/services/postageapp/settings'] = array(
+    'title' => 'Settings',
+    'type' => MENU_DEFAULT_LOCAL_TASK,
+    '#weight' => 0,
+  );
+  
+  $items['admin/config/services/postageapp/forms_vars'] = array(
+    'title' => 'Forms & variables',
+    'type' => MENU_LOCAL_TASK,
+    'page callback' => 'postageapp_page_forms_vars',
+    'access arguments' => array('administer postageapp'),
+    'file' => 'include/postageapp.admin.inc',
+    '#weight' => 2,
+  );
+  $items['admin/config/services/postageapp/forms_vars/%/%'] = array(
+    'title' => 'Forms & variables',
+    'type' => MENU_NORMAL_ITEM,
+    'page callback' => 'postageapp_page_forms_vars',
+    'page arguments' => array(5, 6),
+    'access arguments' => array('administer postageapp'),
+    'file' => 'include/postageapp.admin.inc',
+    '#weight' => 2,
+  );
+  /*
+  $items['admin/postageapp/forms_vars/%/%'] = array(
+    'title' => t('Edit/Delete pa_vars'),
+    'type' => MENU_NORMAL_ITEM,
+    'page callback' => 'postageapp_page_forms_vars',
+    'page arguments' => array(3, 4),
+    'access arguments' => array('administer postageapp'),
+    'file' => 'include/postageapp.admin.inc',
+  );*/
   
   return $items;
 }
@@ -50,23 +83,3 @@ function postageapp_permission() {
     ),
   );
 }
-
-/*
-function drupal_mail_wrapper($message) {
-  $q = new PostageApp(variable_get('postageapp_api_key', '')); 
-  $return = $q->mail(
-    $message['to'], 
-    $message['subject'],
-    $message['body'],
-    $message['headers']
-  );
-  
-  if (!($return->response->status == 'ok')) {
-    watchdog('mail', 'PostageApp: %message.', array('%message' => $return->response->message), WATCHDOG_ERROR);
-    return 0;
-  } else {
-    return $return;
-  }
-}*/
-
-

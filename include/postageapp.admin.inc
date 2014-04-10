@@ -8,140 +8,181 @@
 function postageapp_admin_form() {
   $form = array();
   
-  //override smtp_library variable so we don't have to use built in mail
-  //code taken from SMTP module, Thanks!
-  if (module_exists('mimemail') &&
-      strpos(variable_get('smtp_library', ''), 'mimemail')) {
-    // don't touch smtp_library (mimemail integration function below)
-  }
-  else {
-    if (variable_get('postageapp_on', 0)) {
-      $postageapp_path = drupal_get_filename('module', 'postageapp');
-      
-      if ($postageapp_path) {
-        variable_set('smtp_library', $postageapp_path);
-      }
-      // If drupal can't find the path to the module, display an error.
-      else {
-        drupal_set_message(t("PostageApp.module error: Can't find file."), 'error');
-      }
-    }
-    // If this module is turned off, delete the variable.
-    else {
-      variable_del('smtp_library');
-    }
-  }
-  
   $form['settings'] = array(
     '#type'  => 'fieldset',
     '#title' => t('Postageapp settings'),
   );
-  $form['settings']['postageapp_on'] = array(
-    '#type'          => 'radios',
-    '#title'         => t('Enable Postageapp service'),
-    '#default_value' => variable_get('postageapp_on', 0),
-    '#options'       => array(1 => t('Yes'), 0 => t('No')),
-  );
   
   $form['settings']['postageapp_api_key'] = array(
-      '#type' => 'textfield',
-      '#title' => t('PostageApp API Key'),
-      '#required' => TRUE,
-      '#default_value' => variable_get('postageapp_api_key', ''),
-      '#description' => t('The API key for your PostageApp account. Get or generate a valid API key at your PostageApp dashboard which is available at yourusername.postageapp.com')
+    '#type' => 'textfield',
+    '#title' => t('PostageApp API Key'),
+    '#required' => TRUE,
+    '#default_value' => variable_get('postageapp_api_key', ''),
+    '#description' => t('The API key for your PostageApp account. Get or generate a valid API key at your PostageApp dashboard which is available at yourusername.postageapp.com')
   );
   
-  // only show the list selection forms if account info provided
-  $api_key = variable_get('postageapp_api_key', FALSE);
+  return system_settings_form($form);
+}
+
+/**
+ * Postageapp settings form validate.
+ */
+function postageapp_admin_form_validate($form, &$form_state) {  
+  //
+  $api_key = $form_state['values']['postageapp_api_key'];
   
   if ($api_key) {
     $postage = new PostageApp($api_key);
     $valid_key = $postage->get_project_info();
     
     if ($valid_key->response->status == 'ok') {
-      //dpm($valid_key);
-      /*
-      $form['postageapp_project_info'] = array(
-        '#type'  => 'fieldset',
-        '#title' => t('<strong>Project: </strong>' . $valid_key->data->project->name),
-      );      
-      $form['postageapp_project_info']['url'] = array('#value' => t('<p><strong>Project URL: </strong><a href="' . $valid_key->data->project->url . '">'.$valid_key->data->project->url.'</a></p>'));
-      
-      $form['postageapp_project_info']['transmissions_today'] = array('#value' => t('<p><strong>Transmissions today: </strong>' . $valid_key->data->project->transmissions->today . '</p>'));
-      $form['postageapp_project_info']['transmission_this_month'] = array('#value' => t('<p><strong>Transmissions this month: </strong>' . $valid_key->data->project->transmissions->this_month . '</p>'));
-      $form['postageapp_project_info']['transmission_overall'] = array('#value' => t('<p><strong>Transmissions overall: </strong>' . $valid_key->data->project->transmissions->overall . '</p>'));
-      $form['postageapp_project_info']['users_label'] = array('#value' => t('<p><strong>Users:</strong></p>'));
-      */
-      $users = '';
-      $users_string = '';
-      
-      foreach ($valid_key->data->project->users as $key => $val) {
-        $users[$key] = $val;
-        $users_string .= '<p>' . $val . ': ' . $key . '</p>';
-      }
-      
-      //krumo($users);
-      
-      $form['postageapp_project_info']['users'] = array('#value' => t($users_string));
-      variable_set('postageapp_users', $users);
-      
-      if (!(variable_get('postageapp_test_email_sent', FALSE))) {
-        variable_set('postageapp_test_email_sent', TRUE);
-        drupal_set_message(t('Your API key is valid.  Welcome to PostageApp.'), "notice");
-      }
-      
-      $form['postageapp_debugging'] = array(
-        '#type'          => 'checkbox',
-        '#title'         => t('Enable debugging'),
-        '#default_value' => variable_get('postageapp_debugging', 0),
-        '#description'   => t('Checking this box will send flag messages as testing messages (currently in development).'),
-      );
-      
-      $form['send_test_email'] = array(
-        '#type' => 'button',
-        '#value' => t('Send Test Email'),
-        '#weight' => 19
-      );
+      drupal_set_message(t('Your API key is valid.  Welcome to PostageApp.'), "status");
     }
     else {
-      drupal_set_message(t($valid_key->response->message), "error");
+      form_set_error('postageapp_api_key', t($valid_key->response->message));
+    }
+  }
+}
+
+function postageapp_page_forms_vars($pa_fid = NULL, $op = NULL) {
+  $output = '';
+  
+  $output .= t('Settingas for Postageapp service to use template per form. See <a href="@pa_help">help page</a> for more details.', array('@pa_help' => '/admin/help/postageapp'));
+  $form = drupal_get_form('postageapp_forms_vars_form', $pa_fid);
+  
+  $output .= drupal_render($form);
+  
+  if ($op == 'delete' && $pa_fid) {
+    $vars = unserialize(variable_get('postageapp_forms', ''));
+    unset($vars[$pa_fid]);
+    
+    variable_set('postageapp_forms', serialize($vars));
+    
+    drupal_set_message('@pa_fid form settings for postageapp deleted.', array('@pa_fid' => $pa_fid));
+  }
+  
+  $output .= pa_forms_settings_list();
+  
+  return $output;
+}
+
+function postageapp_forms_vars_form($form, &$form_state, $pa_fid = NULL) {
+  $form = array();
+  
+  // example data for contact form, also used as default value
+  $pa_forms = array(
+    'contact_site_form' => array(
+      'pa_vars' => 'name, mail, subject, message, copy',
+      'pa_template' => 'test-drupal7-dev',
+    )
+  );
+  
+  if (variable_get('postageapp_forms', '') == FALSE) {
+    variable_set('postageapp_forms', serialize($pa_forms));
+  }
+  else {
+    $pa_forms = unserialize(variable_get('postageapp_forms', ''));
+    
+    if ($pa_fid) {
+      $pa_forms = array(
+        $pa_fid =>$pa_forms[$pa_fid]
+      );
     }
   }
   
-  return system_settings_form($form);
+  $keys = array_keys($pa_forms);
+  
+  $form['pa_fid'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('Form ID'),
+    '#default_value' => $keys[0],
+  );
+  
+  $form['pa_fid'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Form ID'),
+    '#default_value' => $keys[0],
+    '#description' => t('Leave the same to owerride existing record. Change the "Form ID" to add new record.'),
+  );
+  $form['pa_vars'] = array(
+    '#type' => 'textarea',
+    '#title' => t('Form variables'),
+    '#description' => t('Form field names property, as list (first_name, last_name, message). Not Label of the form field but name property of the input! Get from existing on this site forms. Leave empty to send all form fields.'),
+    '#default_value' => $pa_forms[$keys[0]]['pa_vars'],
+  );
+  
+  $form['pa_template'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Postageapp template'),
+    '#description' => 'Enter TEMPLATE SLUG here as you naming template in your PA account.',
+    '#default_value' => $pa_forms[$keys[0]]['pa_template'],
+  );
+  
+  $form['submit'] = array(
+    '#type' => 'submit',
+    '#value' => t('Save'),
+  );
+  
+  return $form;
 }
 
-function postageapp_admin_form_validate($form, &$form_state) {
-  if ($form_state['clicked_button']['#value'] == 'Send Test Email') {
-    postageapp_send_test_email();
+function postageapp_forms_vars_form_validate($form, &$form_state) {
+  if (empty($form_state['values']['pa_fid'])) {
+    form_set_error('pa_fid', 'Field "Form ID"can\'t be empty.');
+  }
+  
+  if (empty($form_state['values']['pa_template'])) {
+    form_set_error('pa_template', 'Field "Postageapp template"can\'t be empty.');
   }
 }
 
-function postageapp_send_test_email() {
-  global $language;
+function postageapp_forms_vars_form_submit($form, &$form_state) {
+  // collect data for save in variables
+  $pa_forms = variable_get('postageapp_forms', '');
   
-  $test_address = variable_get('postageapp_users', '');
+  // new form settings
+  $new_pa_form = array(
+    $form_state['values']['pa_fid'] => array(
+      'pa_vars' => $form_state['values']['pa_vars'],
+      'pa_template' => $form_state['values']['pa_template'],
+    ),
+  );
   
-  $test_address = 'info@projectmash.org';
-  
-  $params['subject'] = 'PostageApp test e-mail';
-  $params['body'][] = 'If you receive this message it means your site is capable of sending e-mail using PostageApp.';
-  $q = drupal_mail('postageapp', 'postageapp-test', $test_address, $language -> language, $params);    
-  
-  if (!empty($q['result']) && $q['result']->response->status == 'ok') {
-    drupal_set_message(t('A test e-mail has been sent to @email.', array('@email' => $test_address)));
-  } 
+  // add to existings settings
+  if ($pa_forms) {
+    $pa_forms = unserialize($pa_forms);
+    $pa_forms = array_merge($pa_forms, $new_pa_form);
+    
+    variable_set('postageapp_forms', serialize($pa_forms));
+  }
   else {
-    drupal_set_message(t('You may want to !check for any error messages.', array('!check' => l(t('check the logs'), 'admin/reports/dblog'))), 'error');
+    variable_set('postageapp_forms', serialize($new_pa_form));
   }
 }
 
-/**
- * Implementation of postageapp_mail().
- */
-function postageapp_mail($key, &$message, $params) {
-  if ($key == 'postageapp-test') {
-    $message['subject'] = $params['subject'];
-    $message['body']    = $params['body'];
+//
+
+function pa_forms_settings_list() {
+  $output = '<hr>';
+  $pa_forms = unserialize(variable_get('postageapp_forms', ''));
+  
+  foreach ($pa_forms AS $fid => $vars) {
+    $list = '';
+    $items = '';
+    
+    $items[] = 'Variables: ' . $vars['pa_vars'] . ' ';
+    $items[] = 'Template: ' . $vars['pa_template'] . '<p>';
+    $items[] = l(t('Clone / Edit'), 'admin/config/services/postageapp/forms_vars/' . $fid . '/clone') . ' | ' .
+    l(t('Delete'), 'admin/config/services/postageapp/forms_vars/' . $fid . '/delete');
+    
+    $list['items'] = $items;
+    $list['title'] = $fid;
+    $list['type'] = 'ul';
+    $list['attributes'] = array();
+    
+    $output .= theme_item_list($list);
   }
+  
+  
+  return $output;
 }

@@ -5,9 +5,8 @@
  *
  */
 
-
 /**
- * Provides a mail system class useful for debugging mail output.
+ * Provides a mail system class.
  *
  * Usage in settings.php:
  * @code
@@ -19,20 +18,34 @@ class PostageappDrupalMail extends DefaultMailSystem {
   /**
    * Overrides DefaultMailSystem::mail().
    *
-   * Accepts an e-mail message and displays it on screen, and additionally logs
-   * it to watchdog().
    */
   public function mail(array $message) {
-    $header = "To: {$message['to']} <br />Subject: {$message['subject']}";
-    $string = check_plain(print_r($message, TRUE));
-    $string = '<pre>' . $string . '</pre>';
+    // override default Drupal header Content-type for mail.
+    $message['headers']['Content-Type'] = 'Content-Type: text/html; charset=UTF-8';
+    
+    $fid = $_POST['form_id'];
+    $pa_vars = unserialize(variable_get('postageapp_forms', ''));
+    
+    // get Pa tpl for this form
+    $variables['postageapp_template'] = $pa_vars[$fid]['pa_template'];
+    
+    // webform $_POST['submitted']
+    // prepare variables for Pa template
+    
+    if (strpos($_POST['form_id'], 'webform_client_form_') === 0) {
+      $variables['submitted'] = $_POST['submitted'];
+    }
+    else {
+      $variables['submitted'] = $_POST;
+    }
     
     $q = new PostageApp(variable_get('postageapp_api_key', '')); 
     $return = $q->mail(
       $message['to'], 
       $message['subject'],
       $message['body'],
-      $message['headers']
+      $message['headers'],
+      $variables
     );
     
     return TRUE;

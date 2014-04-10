@@ -34,7 +34,7 @@ function postageapp_requirements($phase) {
       $conf = '$conf[\'mail_system\'][\'default-system\'] = \'PostageappDrupalMail\';';
       
       if (trim($line) == $conf) {
-       $value = 'Postageapp in settings.php OK!';
+       $value = 'Postageapp settings OK! Default mail system is PostageappDrupalMail.';
        $severity = REQUIREMENT_OK;
        
        break;
@@ -42,7 +42,7 @@ function postageapp_requirements($phase) {
       else {
        $value = 'Missing Postageapp settings in settings.php. See README.md
       for instruction!';
-       $severity = REQUIREMENT_WARNING;
+       $severity = REQUIREMENT_ERROR;
       }
     }
    }

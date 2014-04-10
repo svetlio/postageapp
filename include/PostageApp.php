@@ -5,8 +5,7 @@
 
 if(!defined('POSTAGE_HOSTNAME')) define ('POSTAGE_HOSTNAME', 'https://api.postageapp.com');
 
-class PostageApp
-{  
+class PostageApp {  
   // Sends a message to Postage App
   function PostageApp($apikey) {
     $this->api_key = $apikey;
@@ -46,7 +45,6 @@ class PostageApp
     );
   }
   
-  
   # Who's going to receive this email.
   # The $to field can have the following formats:
   #
@@ -62,35 +60,22 @@ class PostageApp
   #     'youremail@somewhere.com' => array('name' => 'Ann Johnson', ...),
   #     ...
   #   )
-  
-  /*
-    TODO: figure out how to send html and plaintext, how to know when to do so, in context of drupal
-  */
-  
   function mail($recipient, $subject, $mail_body, $header, $variables=NULL) {
     $content = array(
       'recipients'  => $recipient,
       'headers'     => array_merge($header, array('Subject' => $subject)),
-      'variables'   => $variables,
+      'variables'   => $variables['submitted'],
       'uid'         => time()
     );
-    /*
-      TODO look at postage API, figure out how to handle templates
-    */
-    // if (is_string($mail_body)) {
-    //   $content['template'] = $mail_body;
-    // } else {
-    //   $content['content'] = $mail_body;
-    // }
     
     $content['content'] = $mail_body;
-    
+    $content['template'] = $variables['postageapp_template'];
     
     return PostageApp::post(
       'send_message', 
       json_encode(
         array(
-          'api_key' => $this->api_key, 
+          'api_key' => $this->api_key,
           'arguments' => $content
         )
       )
@@ -111,6 +96,7 @@ class PostageApp
     curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
     $output = curl_exec($ch);
     curl_close($ch);
+    
     return json_decode($output);
   }
 }
