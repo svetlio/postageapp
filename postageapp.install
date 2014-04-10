@@ -5,11 +5,33 @@
  *   Install file for postageapp module.
  */
 
+function postageapp_install() {
+  $pa_forms = array(
+    'contact_site_form' => array(
+      'pa_vars' => 'name, mail, subject, message, copy',
+      'pa_template' => 'sample_parent_layout',
+    ),
+    'contact_user_form' => array(
+      'pa_vars' => 'name, mail, subject, message, copy',
+      'pa_template' => 'sample_parent_layout',
+    )
+  );
+  
+  variable_set('postageapp_forms', serialize($pa_forms));
+}
+
 /**
  * Implements hook_uninstall().
  */
 function postageapp_uninstall() {
   variable_del('smtp_library');
+  
+  db_delete('variable')
+    ->condition('name', db_like('postageapp') . '%', 'LIKE')
+    ->execute();
+  
+  drupal_set_message(t('Postageapp variables removed.'), 'status');
+  drupal_set_message(t('Delete "$conf[\'mail_system\'][\'default-system\'] = \'PostageappDrupalMail\';" from settings.php!'), 'warning');
 }
 
 /**

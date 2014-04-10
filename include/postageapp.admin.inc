@@ -37,6 +37,7 @@ function postageapp_admin_form_validate($form, &$form_state) {
     
     if ($valid_key->response->status == 'ok') {
       drupal_set_message(t('Your API key is valid.  Welcome to PostageApp.'), "status");
+      drupal_set_message(t('To complete settings add "$conf[\'mail_system\'][\'default-system\'] = \'PostageappDrupalMail\';" to settings.php (without duoble quotes). This settings override default mail system in Drupal to use Postageapp as mail delivery service.'), 'info');
     }
     else {
       form_set_error('postageapp_api_key', t($valid_key->response->message));
@@ -47,7 +48,7 @@ function postageapp_admin_form_validate($form, &$form_state) {
 function postageapp_page_forms_vars($pa_fid = NULL, $op = NULL) {
   $output = '';
   
-  $output .= t('Settingas for Postageapp service to use template per form. See <a href="@pa_help">help page</a> for more details.', array('@pa_help' => '/admin/help/postageapp'));
+  $output .= t('Settings page for Postageapp service to use template per form. See <a href="@pa_help">help page</a> for more details.', array('@pa_help' => '/admin/help/postageapp'));
   $form = drupal_get_form('postageapp_forms_vars_form', $pa_fid);
   
   $output .= drupal_render($form);
