@@ -93,26 +93,35 @@ function postageapp_forms_vars_form($form, &$form_state, $pa_fid = NULL) {
   
   $keys = array_keys($pa_forms);
   
-  $form['pa_fid'] = array(
+  $form['default'] = array(
     '#type' => 'fieldset',
-    '#title' => t('Form ID'),
-    '#default_value' => $keys[0],
+    '#title' => 'default',
+  );
+  $form['default']['postageapp_forms_default'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Default'),
+    '#default_value' => variable_get('postageapp_forms_default', ''),
+    '#description' => t('Postageapp send all mails as is - without using variables.'),
   );
   
-  $form['pa_fid'] = array(
+  $form['fs'] = array(
+    '#type' => 'fieldset',
+    '#title' => 'Form settings',
+  );
+  $form['fs']['pa_fid'] = array(
     '#type' => 'textfield',
     '#title' => t('Form ID'),
     '#default_value' => $keys[0],
     '#description' => t('Leave the same to owerride existing record. Change the "Form ID" to add new record.'),
   );
-  $form['pa_vars'] = array(
+  $form['fs']['pa_vars'] = array(
     '#type' => 'textarea',
     '#title' => t('Form variables'),
     '#description' => t('Form field names property, as list (first_name, last_name, message). Not Label of the form field but name property of the input! Get from existing on this site forms. Leave empty to send all form fields.'),
     '#default_value' => $pa_forms[$keys[0]]['pa_vars'],
   );
   
-  $form['pa_template'] = array(
+  $form['fs']['pa_template'] = array(
     '#type' => 'textfield',
     '#title' => t('Postageapp template'),
     '#description' => 'Enter TEMPLATE SLUG here as you naming template in your PA account.',
@@ -138,6 +147,9 @@ function postageapp_forms_vars_form_validate($form, &$form_state) {
 }
 
 function postageapp_forms_vars_form_submit($form, &$form_state) {
+  
+  variable_set('postageapp_forms_default', $form_state['values']['postageapp_forms_default']);
+  
   // collect data for save in variables
   $pa_forms = variable_get('postageapp_forms', '');
   

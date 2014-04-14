@@ -1,4 +1,12 @@
 Add instal process here
 
-Usage in settings.php:
+Minimal setup requirements
+==========================
+
+1. Add in settings.php:
   $conf['mail_system']['default-system'] = 'PostageappDrupalMail';
+
+2. Create template in your Postageapp account:
+  TEMPLATE SLUG: drupal-default
+
+and SAVE.

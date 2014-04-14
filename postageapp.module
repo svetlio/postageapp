@@ -59,15 +59,6 @@ function postageapp_menu() {
     'file' => 'include/postageapp.admin.inc',
     '#weight' => 2,
   );
-  /*
-  $items['admin/postageapp/forms_vars/%/%'] = array(
-    'title' => t('Edit/Delete pa_vars'),
-    'type' => MENU_NORMAL_ITEM,
-    'page callback' => 'postageapp_page_forms_vars',
-    'page arguments' => array(3, 4),
-    'access arguments' => array('administer postageapp'),
-    'file' => 'include/postageapp.admin.inc',
-  );*/
   
   return $items;
 }

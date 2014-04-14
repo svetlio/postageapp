@@ -14,6 +14,10 @@ function postageapp_install() {
     'contact_user_form' => array(
       'pa_vars' => 'name, mail, subject, message, copy',
       'pa_template' => 'sample_parent_layout',
+    ),
+    'user_pass' => array(
+      'pa_vars' => 'name',
+      'pa_template' => 'sample_parent_layout',
     )
   );
   
@@ -30,8 +34,9 @@ function postageapp_uninstall() {
     ->condition('name', db_like('postageapp') . '%', 'LIKE')
     ->execute();
   
-  drupal_set_message(t('Postageapp variables removed.'), 'status');
-  drupal_set_message(t('Delete "$conf[\'mail_system\'][\'default-system\'] = \'PostageappDrupalMail\';" from settings.php!'), 'warning');
+  // ToDo: set message on uninstall
+  //drupal_set_message(t('Postageapp variables removed.'), 'status');
+  //drupal_set_message(t('Delete "$conf[\'mail_system\'][\'default-system\'] = \'PostageappDrupalMail\';" from settings.php!'), 'warning');
 }
 
 /**

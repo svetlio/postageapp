@@ -61,6 +61,7 @@ class PostageApp {
   #     ...
   #   )
   function mail($recipient, $subject, $mail_body, $header, $variables=NULL) {
+    
     $content = array(
       'recipients'  => $recipient,
       'headers'     => array_merge($header, array('Subject' => $subject)),
