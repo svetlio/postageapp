@@ -6,4 +6,4 @@ Coming soon!!
 Questions / Comments?
 ---------------------
 
-Please visit [http://help.postageapp.com](http://help.postageapp.com)
+Help about PostageApp: [http://help.postageapp.com](http://help.postageapp.com)

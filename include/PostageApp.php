@@ -69,8 +69,8 @@ class PostageApp {
       'uid'         => time()
     );
     
-    $content['content'] = $mail_body;
-    $content['template'] = $variables['postageapp_template'];
+    // use PA template
+    $content['template'] = $mail_body;
     
     return PostageApp::post(
       'send_message', 

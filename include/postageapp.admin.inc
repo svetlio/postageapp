@@ -99,7 +99,7 @@ function postageapp_forms_vars_form($form, &$form_state, $pa_fid = NULL) {
   );
   $form['default']['postageapp_forms_default'] = array(
     '#type' => 'checkbox',
-    '#title' => t('Default'),
+    '#title' => t('Use "drupal-default" Postageapp template for all e-mails'),
     '#default_value' => variable_get('postageapp_forms_default', ''),
     '#description' => t('Postageapp send all mails as is - without using variables.'),
   );
@@ -117,7 +117,7 @@ function postageapp_forms_vars_form($form, &$form_state, $pa_fid = NULL) {
   $form['fs']['pa_vars'] = array(
     '#type' => 'textarea',
     '#title' => t('Form variables'),
-    '#description' => t('Form field names property, as list (first_name, last_name, message). Not Label of the form field but name property of the input! Get from existing on this site forms. Leave empty to send all form fields.'),
+    '#description' => t('Form field names property, as list (first_name, last_name, message). Not Label of the form field but name property of the input! Get from existing on this site forms.'),
     '#default_value' => $pa_forms[$keys[0]]['pa_vars'],
   );
   

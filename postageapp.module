@@ -13,7 +13,7 @@ function postageapp_help($path, $arg) {
   $output = '';
   switch ($path) {
     case "admin/help#postageapp":
-      $output = '<p>'.  t("Allows you to using the PostageApp API to send mail. We can send mails without own mail server application on your server. Instead, module send all outgoing site emails to Postageapp. How the module send messages to postageapp without real mail server - you can see in module code.<br>There we may use templates to get html on the messages before they send to their recepients.<p> <b>Important for settings!</b> You need to make template before using it. See Postageapp docs for this. Ont his site we can setup template for each mail form. Go to settings link.<p> See <a href=\"@postageapp\" target=\"_blank\">postageapp site</a> for more info.", array('@postageapp' => url('http://postageapp.com'))) .'</p>';
+      $output = '<p>'.  t("Allows you to using the PostageApp API to send mail. We can send mails without own mail server application on your server. Instead, module send all outgoing site emails to Postageapp. How the module send messages to postageapp without real mail server - you can see in module code.<br>There we may use templates to get html on the messages before they send to their recepients.<p> <b>Important for settings!</b> You need to make template before using it. See Postageapp docs for this. On this site we can setup template for each mail form. Go to settings link.<p> See <a href=\"@postageapp\" target=\"_blank\">postageapp site</a> for more info.", array('@postageapp' => url('http://postageapp.com'))) .'</p>';
       break;
     case "admin/config/services/postageapp":
       $output = '<p>'.  t("Enter text here to describe how to set up postageApp.  See http://postageapp.com for more info.") .'</p>';
@@ -73,4 +73,44 @@ function postageapp_permission() {
       'description' => t('Perform administration tasks for Postageapp.'),
     ),
   );
+}
+
+/**
+ * Helper for PostageappDrupalMail to get additional vars for PA tpl.
+ */
+function postageapp_variables_submitted($post = NULL) {
+  global $user;
+  $vars = array();
+  //
+  $vars['site_name'] = variable_get('site_name', '');
+  
+  if (!empty($user -> name)) {
+    $vars['user_name'] = $user -> name;
+  }
+  
+  if (@$post['mail']) {
+    $vars['mail'] = @$post['mail'] ? $post['mail'] : @$post['name'];
+  }
+  dpm($post);
+  // register form
+  if ($post['form_id'] == 'user_register_form') {
+    //
+    $vars['name'] = $post['name'];
+    $vars['mail'] = $post['mail'];
+  }
+  // reset passwd
+  elseif ($post['form_id'] == 'user_pass') {
+    if (valid_email_address($post['name'])) {
+      $account = user_load_by_mail($post['name']);
+    }
+    else {
+      $account = user_load_by_name($post['name']);
+    }
+    
+    if ($account) {
+      $vars['user_pass_reset_url'] = user_pass_reset_url($account);
+    }
+  }
+  
+  return $vars;
 }
