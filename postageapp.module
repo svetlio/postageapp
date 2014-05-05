@@ -115,5 +115,10 @@ function postageapp_variables_submitted($post = NULL) {
     }
   }
   
+  // allow other modules to use $vars to change it, or to add own variables
+  drupal_alter('postageapp_vars', $vars, $post);
+  
   return $vars;
 }
+
+

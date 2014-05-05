@@ -10,3 +10,5 @@ Minimal setup requirements
   TEMPLATE SLUG: drupal-default
 
 and SAVE.
+
+Use own module to add variables for Postageapp template - see postageapp.api.php on module folder.
