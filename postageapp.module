@@ -85,18 +85,21 @@ function postageapp_variables_submitted($post = NULL) {
   $vars['site_name'] = variable_get('site_name', '');
   
   if (!empty($user -> name)) {
-    $vars['user_name'] = $user -> name;
+    $vars['name'] = $user -> name;
   }
   
   if (@$post['mail']) {
     $vars['mail'] = @$post['mail'] ? $post['mail'] : @$post['name'];
   }
-  dpm($post);
+  
   // register form
   if ($post['form_id'] == 'user_register_form') {
     //
     $vars['name'] = $post['name'];
     $vars['mail'] = $post['mail'];
+    
+    $account = user_load_by_name($post['name']);
+    $vars['user_pass_reset_url'] = user_pass_reset_url($account);
   }
   // reset passwd
   elseif ($post['form_id'] == 'user_pass') {

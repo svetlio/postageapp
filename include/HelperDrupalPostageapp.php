@@ -46,6 +46,10 @@ class PostageappDrupalMail extends DefaultMailSystem {
       $variables['submitted'] = array_merge($variables['submitted'], $_POST['submitted']);
     }
     
+    // add all keys
+    $keys = array_keys($variables['submitted']);
+    $variables['submitted']['keys'] = implode(', ', $keys);
+    
     //
     $to = $message['to'];
     $subject = $message['subject'];
