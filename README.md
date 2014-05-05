@@ -30,3 +30,10 @@ Questions / Comments?
 ---------------------
 
 Help about PostageApp: [http://help.postageapp.com](http://help.postageapp.com)
+
+Author
+======
+
+Drupal 7 developer [https://github.com/svetlio](svetlio)
+
+Initial development for Drupal-6 on https://github.com/postageapp/postageapp-drupal by [https://github.com/stephentwg](stephentwg)
