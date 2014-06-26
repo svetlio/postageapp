@@ -113,13 +113,13 @@ function postageapp_forms_vars_form($form, &$form_state, $pa_fid = NULL) {
     '#title' => t('Form ID'),
     '#default_value' => $keys[0],
     '#description' => t('Leave the same to owerride existing record. Change the "Form ID" to add new record.'),
-  );
+  );/*
   $form['fs']['pa_vars'] = array(
     '#type' => 'textarea',
     '#title' => t('Form variables'),
     '#description' => t('Form field names property, as list (first_name, last_name, message). Not Label of the form field but name property of the input! Get from existing on this site forms.'),
     '#default_value' => $pa_forms[$keys[0]]['pa_vars'],
-  );
+  );*/
   
   $form['fs']['pa_template'] = array(
     '#type' => 'textfield',
@@ -156,7 +156,7 @@ function postageapp_forms_vars_form_submit($form, &$form_state) {
   // new form settings
   $new_pa_form = array(
     $form_state['values']['pa_fid'] => array(
-      'pa_vars' => $form_state['values']['pa_vars'],
+      //'pa_vars' => $form_state['values']['pa_vars'],
       'pa_template' => $form_state['values']['pa_template'],
     ),
   );
@@ -183,7 +183,7 @@ function pa_forms_settings_list() {
     $list = '';
     $items = '';
     
-    $items[] = 'Variables: ' . $vars['pa_vars'] . ' ';
+    //$items[] = 'Variables: ' . $vars['pa_vars'] . ' ';
     $items[] = 'Template: ' . $vars['pa_template'] . '<p>';
     $items[] = l(t('Clone / Edit'), 'admin/config/services/postageapp/forms_vars/' . $fid . '/clone') . ' | ' .
     l(t('Delete'), 'admin/config/services/postageapp/forms_vars/' . $fid . '/delete');
@@ -195,7 +195,6 @@ function pa_forms_settings_list() {
     
     $output .= theme_item_list($list);
   }
-  
   
   return $output;
 }
