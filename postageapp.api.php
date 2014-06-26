@@ -16,7 +16,7 @@
  *  @param $post
  *  array of data sent by form (e.g. $_POST)
  */
-function hook_postageapp_vars(&$vars, $post) {
+function hook_postageapp_vars_alter(&$vars, $post, $message) {
   // add new var or change existing
   $vars['my_var_to_send_to_postagapp_template'] = 'value';
 }
