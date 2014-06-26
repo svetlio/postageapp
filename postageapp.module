@@ -3,7 +3,7 @@
 /**
  * @file
  * Enables Drupal to send e-mail using the PostageApp API.
- * 
+ *
  */
 
 /**
@@ -41,7 +41,7 @@ function postageapp_menu() {
     'type' => MENU_DEFAULT_LOCAL_TASK,
     '#weight' => 0,
   );
-  
+
   $items['admin/config/services/postageapp/forms_vars'] = array(
     'title' => 'Forms & variables',
     'type' => MENU_LOCAL_TASK,
@@ -59,7 +59,7 @@ function postageapp_menu() {
     'file' => 'include/postageapp.admin.inc',
     '#weight' => 2,
   );
-  
+
   return $items;
 }
 
@@ -78,28 +78,35 @@ function postageapp_permission() {
 /**
  * Helper for PostageappDrupalMail to get additional vars for PA tpl.
  */
-function postageapp_variables_submitted($post = NULL) {
+function postageapp_variables_submitted($post = NULL, $message) {
+  //dpm($message);
   global $user;
   $vars = array();
+
+//  $vars['form_id'] = $post['form_id'];
+
+  $vars['subject'] = $message['subject'];
+  $vars['message'] = $message['body'];
   //
   $vars['site_name'] = variable_get('site_name', '');
-  
+
   if (!empty($user -> name)) {
     $vars['name'] = $user -> name;
   }
-  
+
   if (@$post['mail']) {
     $vars['mail'] = @$post['mail'] ? $post['mail'] : @$post['name'];
   }
-  
+
   // register form
   if ($post['form_id'] == 'user_register_form') {
     //
     $vars['name'] = $post['name'];
     $vars['mail'] = $post['mail'];
-    
+
     $account = user_load_by_name($post['name']);
-    $vars['user_pass_reset_url'] = user_pass_reset_url($account);
+
+    $vars['one_time_login_url'] = user_pass_reset_url($account);
   }
   // reset passwd
   elseif ($post['form_id'] == 'user_pass') {
@@ -109,15 +116,18 @@ function postageapp_variables_submitted($post = NULL) {
     else {
       $account = user_load_by_name($post['name']);
     }
-    
+
     if ($account) {
-      $vars['user_pass_reset_url'] = user_pass_reset_url($account);
+
+      $vars['name'] = $account->name;
+      $vars['mail'] = $account->mail;
+      $vars['one_time_login_url'] = user_pass_reset_url($account);
     }
   }
-  
+
   // allow other modules to use $vars to change it, or to add own variables
-  drupal_alter('postageapp_vars', $vars, $post);
-  
+  drupal_alter('postageapp_vars', $vars, $post, $message);
+
   return $vars;
 }
 
