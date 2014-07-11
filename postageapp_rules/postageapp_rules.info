@@ -1,0 +1,6 @@
+name = PostageApp Rules
+description = PostageApp Rules integration to set PA template and variables for e-mails, sent with Rules.
+package = Mail
+core = 7.x
+dependencies[] = postageapp
+dependencies[] = rules

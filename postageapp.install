@@ -22,6 +22,7 @@ function postageapp_install() {
   );
   
   variable_set('postageapp_forms', serialize($pa_forms));
+  variable_set('postageapp_template_default', 'sample_child_template');
 }
 
 /**

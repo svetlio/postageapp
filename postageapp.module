@@ -13,7 +13,7 @@ function postageapp_help($path, $arg) {
   $output = '';
   switch ($path) {
     case "admin/help#postageapp":
-      $output = '<p>'.  t("Allows you to using the PostageApp API to send mail. We can send mails without own mail server application on your server. Instead, module send all outgoing site emails to Postageapp. <br>There we may use templates to get html on the messages before they send to their recepients.<p> <b>Important for settings!</b> You need to make template before using it. See Postageapp docs for this. On this site we can setup template for each mail form. Go to settings link.<p> See <a href=\"@postageapp\" target=\"_blank\">postageapp site</a> for more info.", array('@postageapp' => url('http://postageapp.com'))) .'</p>';
+      $output = '<p>'.  t("Allows you to using the PostageApp API to send mail. We can send mails without own mail server application on your server. Instead, module send all outgoing site emails to Postageapp. How the module send messages to postageapp without real mail server - you can see in module code.<br>There we may use templates to get html on the messages before they send to their recepients.<p> <b>Important for settings!</b> You need to make template before using it. See Postageapp docs for this. On this site we can setup template for each mail form. Go to settings link.<p> See <a href=\"@postageapp\" target=\"_blank\">postageapp site</a> for more info.", array('@postageapp' => url('http://postageapp.com'))) .'</p>';
       break;
     case "admin/config/services/postageapp":
       $output = '<p>'.  t("Enter text here to describe how to set up postageApp.  See http://postageapp.com for more info.") .'</p>';
@@ -43,7 +43,7 @@ function postageapp_menu() {
   );
 
   $items['admin/config/services/postageapp/forms_vars'] = array(
-    'title' => 'Forms & templates',
+    'title' => 'Forms & variables',
     'type' => MENU_LOCAL_TASK,
     'page callback' => 'postageapp_page_forms_vars',
     'access arguments' => array('administer postageapp'),
@@ -51,7 +51,7 @@ function postageapp_menu() {
     '#weight' => 2,
   );
   $items['admin/config/services/postageapp/forms_vars/%/%'] = array(
-    'title' => 'Forms & templates',
+    'title' => 'Forms & variables',
     'type' => MENU_NORMAL_ITEM,
     'page callback' => 'postageapp_page_forms_vars',
     'page arguments' => array(5, 6),
@@ -106,7 +106,7 @@ function postageapp_variables_submitted($post = NULL, $message) {
 
     $account = user_load_by_name($post['name']);
 
-    $vars['one_time_login_url'] = user_pass_reset_url($account);
+    $vars['one_time_login_url'] = mash_user_pass_reset_url($account);
   }
   // reset passwd
   elseif ($post['form_id'] == 'user_pass') {

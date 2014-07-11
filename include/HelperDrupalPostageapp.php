@@ -14,33 +14,68 @@
  * @endcode
  */
 class PostageappDrupalMail extends DefaultMailSystem {
+  /**
+   * Concatenate and wrap the e-mail body for HTML mails.
+   *
+   * @param array $message
+   *   A message array, as described in hook_mail_alter() with optional
+   *   parameters described in mimemail_prepare_message().
+   *
+   * @return array
+   *   The formatted $message.
+   */
+  public function format(array $message) {
+    if (is_array($message['body'])) {
+      $message['body'] = implode("\n\n", $message['body']);
+    }
 
+    if (preg_match('/plain/', $message['headers']['Content-Type'])) {
+      $message['body'] = check_markup($message['body'], 'full_html');
+    }
+
+    return $message;
+  }
+  
   /**
    * Overrides DefaultMailSystem::mail().
    *
    */
   public function mail(array $message) {
     $variables = array();
-
+    //dpm($message);
+    //
+    if ($message['module'] == 'postageapp_rules') {
+      $message['subject'] = $message['params']['subject'];
+      $message['body'] = $message['params']['message'];
+    }
+    
     $variables['submitted'] = array();
-    // override body content to PA template
-    $mail_body = 'sample_child_template';
-
     $form_id = $_POST['form_id'];
-
+    
+    // get settings for form/tpl
     $pa_vars = unserialize(variable_get('postageapp_forms', ''));
 
-    // use drupal-default template if sett default
-    if (variable_get('postageapp_forms_default', '')) {
-      $mail_body = 'drupal-default';
+    // 
+    if (!empty($pa_vars[$form_id]['pa_template'])) {
+      // get Pa tpl for this form
+      $mail_body['template'] = $pa_vars[$form_id]['pa_template'];
     }
+    
+    // check for rules pa_template
+    // rules template override form template if any
+    if (!empty($message['params']['pa_template'])) {
+      $mail_body['template'] = $message['params']['pa_template'];
+    }
+    
+    // use default template if none set
+    if (empty($mail_body['template']) && variable_get('postageapp_template_default', '')) {
+      $mail_body['template'] = variable_get('postageapp_template_default', '');
+    }
+    // use PA to just resend email as is
     else {
-      if (!empty($pa_vars[$form_id]['pa_template'])) {
-        // get Pa tpl for this form
-        $mail_body = $pa_vars[$form_id]['pa_template'];
-      }
+      $mail_body['content'] = $message['body'];
     }
-
+    
     // prepare variables for Pa template
     $variables['submitted'] = postageapp_variables_submitted($_POST, $message);
 
@@ -56,7 +91,6 @@ class PostageappDrupalMail extends DefaultMailSystem {
     //
     $to = $message['to'];
     $subject = $message['subject'];
-    //$mail_body = $message['body'];
     $header = array(
       'X-Mailer' => 'Drupal 7',
       'From' => $message['headers']['From'],

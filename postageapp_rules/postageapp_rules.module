@@ -1,0 +1,17 @@
+<?php
+
+/**
+ * Implements hook_postageapp_vars_alter().
+ */
+function postageapp_rules_postageapp_vars_alter(&$vars, $post, $message) {
+  
+  if (!empty($message['params']['pa_variables'])) {
+    $lines = explode(PHP_EOL, $message['params']['pa_variables']);
+    
+    foreach ($lines AS $line) {
+      $var = explode('|', $line);
+      
+      $vars[$var[0]] = token_replace($var[1]);
+    }
+  }
+}
