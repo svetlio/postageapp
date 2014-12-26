@@ -83,8 +83,8 @@ function postageapp_forms_vars_form($form, &$form_state, $pa_fid = NULL) {
   }
   else {
     $pa_forms = unserialize(variable_get('postageapp_forms', ''));
-    
-    if ($pa_fid) {
+    //dpm($pa_forms);
+    if (!empty($pa_forms[$pa_fid])) {
       $pa_forms = array(
         $pa_fid =>$pa_forms[$pa_fid]
       );

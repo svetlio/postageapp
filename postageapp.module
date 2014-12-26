@@ -43,7 +43,7 @@ function postageapp_menu() {
   );
 
   $items['admin/config/services/postageapp/forms_vars'] = array(
-    'title' => 'Forms & variables',
+    'title' => 'Forms & templates',
     'type' => MENU_LOCAL_TASK,
     'page callback' => 'postageapp_page_forms_vars',
     'access arguments' => array('administer postageapp'),
@@ -51,7 +51,7 @@ function postageapp_menu() {
     '#weight' => 2,
   );
   $items['admin/config/services/postageapp/forms_vars/%/%'] = array(
-    'title' => 'Forms & variables',
+    'title' => 'Forms & templates',
     'type' => MENU_NORMAL_ITEM,
     'page callback' => 'postageapp_page_forms_vars',
     'page arguments' => array(5, 6),
@@ -104,9 +104,9 @@ function postageapp_variables_submitted($post = NULL, $message) {
     $vars['name'] = $post['name'];
     $vars['mail'] = $post['mail'];
 
-    $account = user_load_by_name($post['name']);
+    //$account = user_load_by_name($post['name']);
 
-    $vars['one_time_login_url'] = mash_user_pass_reset_url($account);
+    //$vars['one_time_login_url'] = mash_user_pass_reset_url($account);
   }
   // reset passwd
   elseif ($post['form_id'] == 'user_pass') {

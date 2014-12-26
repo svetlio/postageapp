@@ -8,15 +8,12 @@
 function postageapp_install() {
   $pa_forms = array(
     'contact_site_form' => array(
-      'pa_vars' => 'name, mail, subject, message, copy',
       'pa_template' => 'sample_parent_layout',
     ),
     'contact_user_form' => array(
-      'pa_vars' => 'name, mail, subject, message, copy',
       'pa_template' => 'sample_parent_layout',
     ),
     'user_pass' => array(
-      'pa_vars' => 'name',
       'pa_template' => 'sample_parent_layout',
     )
   );
